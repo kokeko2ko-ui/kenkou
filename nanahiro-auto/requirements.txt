@@ -1,8 +1,7 @@
 anthropic
 elevenlabs
 requests
-moviepy
-google-api-python-client
+moviepy==1.0.3
 google-auth-httplib2
 google-auth-oauthlib
 python-dotenv
