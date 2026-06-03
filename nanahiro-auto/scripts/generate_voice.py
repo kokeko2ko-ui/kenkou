@@ -15,8 +15,8 @@ def generate_voice(script_data: dict) -> str:
         raise ValueError("ELEVENLABS_VOICE_IDが設定されていません")
 
     clean_text = clean_script(script_text)
-    # ElevenLabsは1リクエスト最大5000文字
-    clean_text = clean_text[:5000]
+    # ElevenLabsは1リクエスト最大4000文字
+    clean_text = clean_text[:4000]
 
     print(f"[音声生成] テキスト文字数: {len(clean_text)}")
     print(f"[音声生成] ボイスID: {VOICE_ID[:8]}...")
