@@ -19,12 +19,12 @@ jobs:
         with:
           python-version: "3.11"
 
-       - name: 依存ライブラリをインストール
+      - name: 依存ライブラリをインストール
         run: |
           pip install -r nanahiro-auto/requirements.txt
           sudo apt-get update && sudo apt-get install -y ffmpeg imagemagick
           sudo sed -i 's/rights="none" pattern="PDF"/rights="read|write" pattern="PDF"/' /etc/ImageMagick-6/policy.xml
-     
+
       - name: パイプライン実行
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
