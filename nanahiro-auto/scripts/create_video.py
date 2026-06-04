@@ -1,33 +1,61 @@
 import os
-import requests
 import json
+import requests
+import anthropic
 from datetime import datetime
 from moviepy.editor import (
     VideoFileClip, AudioFileClip, CompositeVideoClip,
-    concatenate_videoclips, TextClip, ColorClip
+    concatenate_videoclips, TextClip, ColorClip, ImageClip
 )
 
 PEXELS_API_KEY = os.environ["PEXELS_API_KEY"]
+ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 TARGET_W, TARGET_H = 1280, 720
+MIN_ALIGNMENT_SCORE = 3
+
+
+def get_alignment_score(sentence: str, video_description: str) -> int:
+    """台本のセリフと映像の一致度を1-5でスコアリング"""
+    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+    try:
+        response = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=50,
+            system="数字1つだけ返してください。",
+            messages=[{
+                "role": "user",
+                "content": f"""台本のセリフ：「{sentence[:100]}」
+映像の内容：「{video_description}」
+
+このセリフにこの映像は合っていますか？1-5で評価してください。
+5=完全一致 4=よく合う 3=関連あり 2=弱い関連 1=無関係
+数字1つだけ答えてください。"""
+            }]
+        )
+        score = int(response.content[0].text.strip()[0])
+        return min(max(score, 1), 5)
+    except:
+        return 2
 
 
 def search_pexels_videos(query: str, count: int = 5) -> list:
+    """Pexelsから映像を検索"""
     url = "https://api.pexels.com/videos/search"
     headers = {"Authorization": PEXELS_API_KEY}
     params = {"query": query, "per_page": count, "orientation": "landscape"}
     try:
         response = requests.get(url, headers=headers, params=params, timeout=15)
         data = response.json()
-        videos = []
+        results = []
         for video in data.get("videos", []):
-            best = None
             for f in video.get("video_files", []):
                 if f.get("width", 0) >= 1280 and f.get("height", 0) >= 720:
-                    if best is None or f.get("width", 0) < best.get("width", 9999):
-                        best = f
-            if best:
-                videos.append(best["link"])
-        return videos
+                    results.append({
+                        "url": f["link"],
+                        "description": video.get("url", ""),
+                    })
+                    break
+        return results
     except Exception as e:
         print(f"[Pexels検索エラー] {e}")
         return []
@@ -45,117 +73,159 @@ def download_video(url: str, path: str) -> bool:
         return False
 
 
-def make_text_clip(text: str, duration: float, fontsize: int = 36) -> TextClip:
+def extract_keywords(sentence: str) -> str:
+    """台本から検索キーワードを抽出"""
+    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
     try:
+        response = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=30,
+            system="英語のキーワードのみ返してください。",
+            messages=[{
+                "role": "user",
+                "content": f"この文章に合う映像を検索するための英語キーワードを3語以内で：「{sentence[:80]}」"
+            }]
+        )
+        return response.content[0].text.strip()
+    except:
+        return "emotional story japan"
+
+
+def find_aligned_video(sentence: str, temp_dir: str, index: int) -> str:
+    """アライメントスコア3以上の映像を探す"""
+    keywords = extract_keywords(sentence)
+    print(f"  [検索] '{keywords}' でPexels検索中...")
+
+    videos = search_pexels_videos(keywords, count=5)
+
+    for i, video in enumerate(videos):
+        path = f"{temp_dir}/clip_{index}_{i}.mp4"
+        if download_video(video["url"], path):
+            score = get_alignment_score(sentence, keywords)
+            print(f"  [スコア] {score}/5 - {keywords}")
+            if score >= MIN_ALIGNMENT_SCORE:
+                return path
+            else:
+                os.remove(path)
+
+    # フォールバック：テキストカードを使用
+    print(f"  [フォールバック] スコア不足 → テキストカードを使用")
+    return None
+
+
+def make_text_card(text: str, duration: float) -> ColorClip:
+    """テキストカードを生成（映像が見つからない場合のフォールバック）"""
+    bg = ColorClip(size=(TARGET_W, TARGET_H), color=(20, 20, 40), duration=duration)
+    try:
+        txt = TextClip(
+            text[:50],
+            fontsize=40,
+            color="white",
+            stroke_color="gray",
+            stroke_width=1,
+            method="caption",
+            size=(TARGET_W - 120, None),
+            align="center",
+        ).set_duration(duration).set_pos("center")
+        return CompositeVideoClip([bg, txt], size=(TARGET_W, TARGET_H))
+    except:
+        return bg
+
+
+def make_subtitle(text: str, duration: float) -> TextClip:
+    """字幕クリップを生成"""
+    try:
+        # 35文字で折り返し
+        if len(text) > 35:
+            text = text[:35] + "\n" + text[35:70]
         clip = TextClip(
             text,
-            fontsize=fontsize,
+            fontsize=34,
             color="white",
             stroke_color="black",
             stroke_width=2,
             method="caption",
             size=(TARGET_W - 80, None),
             align="center",
-        ).set_duration(duration)
+        ).set_duration(duration - 0.2)
         return clip
     except Exception as e:
-        print(f"[テロップ生成エラー] {e}")
+        print(f"[字幕エラー] {e}")
         return None
 
 
 def create_video(script_data: dict, audio_path: str) -> str:
     title = script_data.get("title", "動画")
-    theme = script_data.get("theme_selected", "感動 家族")
     script_text = script_data.get("script", "")
 
-    print(f"[動画合成] テーマ: {theme}")
+    print(f"[動画合成] アライメントスコアモードで開始")
 
     # 音声読み込み
     audio = AudioFileClip(audio_path)
     total_duration = audio.duration
     print(f"[動画合成] 音声の長さ: {total_duration:.1f}秒")
 
-    # Pexelsから映像を取得
-    search_queries = [
-        theme,
-        "family emotional story japan",
-        "elderly people walking nature",
-        "sunset mountain peaceful",
-        "japanese town street",
-    ]
+    # 台本を文に分割
+    sentences = []
+    for line in script_text.replace("。", "。\n").split("\n"):
+        line = line.strip()
+        if len(line) > 5:
+            sentences.append(line)
+
+    # 最大20シーンに分割
+    max_scenes = min(20, len(sentences))
+    scene_sentences = sentences[:max_scenes]
+    scene_duration = total_duration / max(len(scene_sentences), 1)
+
+    print(f"[動画合成] {len(scene_sentences)}シーンに分割 (各{scene_duration:.1f}秒)")
 
     os.makedirs("temp", exist_ok=True)
-    video_paths = []
 
-    for i, query in enumerate(search_queries):
-        urls = search_pexels_videos(query, count=2)
-        for j, url in enumerate(urls):
-            path = f"temp/clip_{i}_{j}.mp4"
-            print(f"[動画合成] ダウンロード中: {query[:20]}...")
-            if download_video(url, path):
-                video_paths.append(path)
-            if len(video_paths) >= 8:
-                break
-        if len(video_paths) >= 8:
-            break
-
-    print(f"[動画合成] 取得できた映像: {len(video_paths)}本")
-
-    # 映像クリップを結合
-    clips = []
-    if video_paths:
-        clip_duration = total_duration / max(len(video_paths), 1)
-        for path in video_paths:
-            try:
-                clip = VideoFileClip(path)
-                # リサイズ
-                clip = clip.resize((TARGET_W, TARGET_H))
-                # クリップの長さを調整
-                use_duration = min(clip_duration, clip.duration)
-                clip = clip.subclip(0, use_duration)
-                clips.append(clip)
-            except Exception as e:
-                print(f"[クリップエラー] {path}: {e}")
-
-    if not clips:
-        print("[警告] 映像が取得できなかったため黒背景を使用します")
-        clips = [ColorClip(size=(TARGET_W, TARGET_H), color=(10, 10, 30), duration=total_duration)]
-
-    # 映像を結合
-    base_video = concatenate_videoclips(clips, method="compose")
-
-    # 音声の長さに合わせる
-    if base_video.duration < total_duration:
-        loops = int(total_duration / base_video.duration) + 1
-        base_video = concatenate_videoclips([base_video] * loops, method="compose")
-    base_video = base_video.subclip(0, total_duration)
-
-    # テロップ生成
-    print("[動画合成] テロップを生成中...")
+    # 各シーンに映像を割り当て
+    video_clips = []
     subtitle_clips = []
-    try:
-        sentences = [s.strip() for s in script_text.replace("。", "。\n").split("\n") if s.strip() and len(s.strip()) > 3]
-        sentences = sentences[:int(total_duration / 4)]  # 4秒に1テロップ
 
-        sub_duration = total_duration / max(len(sentences), 1)
-        for i, sentence in enumerate(sentences):
-            start_time = i * sub_duration
-            # 35文字で折り返し
-            if len(sentence) > 35:
-                sentence = sentence[:35] + "\n" + sentence[35:70]
+    for i, sentence in enumerate(scene_sentences):
+        start_time = i * scene_duration
+        print(f"\n[シーン {i+1}/{len(scene_sentences)}] {sentence[:30]}...")
 
-            txt_clip = make_text_clip(sentence, sub_duration - 0.3)
-            if txt_clip:
-                txt_clip = txt_clip.set_start(start_time).set_pos(("center", TARGET_H - 120))
-                subtitle_clips.append(txt_clip)
-    except Exception as e:
-        print(f"[テロップエラー] {e}")
+        video_path = find_aligned_video(sentence, "temp", i)
+
+        if video_path and os.path.exists(video_path):
+            try:
+                clip = VideoFileClip(video_path)
+                clip = clip.resize((TARGET_W, TARGET_H))
+                use_dur = min(scene_duration, clip.duration)
+                clip = clip.subclip(0, use_dur)
+                if use_dur < scene_duration:
+                    # 短い場合はループ
+                    loops = int(scene_duration / use_dur) + 1
+                    clip = concatenate_videoclips([clip] * loops).subclip(0, scene_duration)
+                clip = clip.set_start(start_time)
+                video_clips.append(clip)
+            except Exception as e:
+                print(f"  [クリップエラー] {e} → テキストカードを使用")
+                card = make_text_card(sentence, scene_duration).set_start(start_time)
+                video_clips.append(card)
+        else:
+            card = make_text_card(sentence, scene_duration).set_start(start_time)
+            video_clips.append(card)
+
+        # 字幕追加
+        sub = make_subtitle(sentence, scene_duration)
+        if sub:
+            sub = sub.set_start(start_time).set_pos(("center", TARGET_H - 120))
+            subtitle_clips.append(sub)
+
+    # 映像が空の場合のフォールバック
+    if not video_clips:
+        video_clips = [ColorClip(size=(TARGET_W, TARGET_H), color=(10, 10, 30), duration=total_duration)]
 
     # 合成
-    print("[動画合成] 映像・音声・テロップを合成中...")
-    all_clips = [base_video] + subtitle_clips
+    print("\n[動画合成] 全クリップを合成中...")
+    all_clips = video_clips + subtitle_clips
     final_video = CompositeVideoClip(all_clips, size=(TARGET_W, TARGET_H))
-    final_video = final_video.set_audio(audio)
+    final_video = final_video.set_duration(total_duration).set_audio(audio)
 
     # 出力
     output_dir = "output"
@@ -173,15 +243,12 @@ def create_video(script_data: dict, audio_path: str) -> str:
     )
 
     # 一時ファイル削除
-    for path in video_paths:
+    import glob
+    for f in glob.glob("temp/*.mp4"):
         try:
-            os.remove(path)
+            os.remove(f)
         except:
             pass
 
     print(f"[動画合成完了] 保存先: {filename}")
     return filename
-
-
-if __name__ == "__main__":
-    print("動画合成モジュールです。main.pyから呼び出してください。")
