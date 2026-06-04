@@ -18,38 +18,38 @@ THEMES = [
 SYSTEM_PROMPT = """あなたは感動系YouTubeチャンネル「人生は七色」の台本ライターです。
 顔出しなし・ナレーション読み上げ型の動画台本を作成します。
 
+【重要】台本（script）はナレーターが読み上げる文章のみを書いてください。
+- 記号（☆、◆、●など）は一切使わない
+- 【フック】【背景】などの見出しは一切書かない
+- 演出メモ・ト書きは一切書かない
+- ナレーターが声に出して読む文章だけを書く
+- 句読点は「。」「、」のみ使用
+
 【チャンネルスタイル】
 - 第三者視点でナレーション
 - 高齢者・主婦層をメインターゲット
-- 冒頭は「侮辱・見下し・絶望」から始まる逆転構造
-- 台本は5000文字以内で作成すること（厳守）
+- 冒頭は謎めいた場面描写から始める（説明ゼロ）
+- 台本は5000文字以内
 
-【台本構成（5段階）】
-①フック（〜1分）：音・映像描写のみ。謎の提示
-②背景（2〜3分）：主人公の日常・転落前
-③試練・選択（3〜4分）：感情の谷。苦労・屈辱
-④真実の発覚（2〜3分）：感情の頂点
-⑤余韻・締め（1〜2分）：視聴者への語りかけ＋CTA
+【構成】
+冒頭（約500文字）：謎の場面描写。何が起きているかわからない状態から始める
+背景（約1500文字）：主人公の日常・転落前の様子
+試練（約1500文字）：苦労・屈辱・葛藤
+真実（約1000文字）：感情のピーク。知られざる事実の発覚
+余韻（約500文字）：静かな締め＋CTA
 
-【必須要素】
-- 感情ピーク3か所
-- 離脱防止フック3か所
-- 具体的な数字・固有名詞・五感の描写
-- テーマを直接言わない
-
-【締め文言（固定）】
-このチャンネルでは、忙しい毎日の中で忘れかけている「大切なこと」をお届けしています。
-チャンネル登録とベルマークで、次の話もあなたのもとに届けます。
+【締め文言（必ず最後に入れる）】
+このチャンネルでは、忙しい毎日の中で忘れかけている大切なことをお届けしています。チャンネル登録とベルマークで、次の話もあなたのもとに届けます。それではまた、心に響くお話でお会いしましょう。
 
 出力はJSON形式で返してください：
 {
   "title": "タイトル【実話・感動】",
   "subtitle": "サブ案【実話】",
   "theme": "テーマ",
-  "script": "台本本文（5000文字以内）",
-  "tags": ["タグ1"...（30個）],
+  "script": "ナレーション本文のみ（記号・見出しなし・5000文字以内）",
+  "tags": ["タグ1", "タグ2",...（30個）],
   "description": "YouTube説明文",
-  "thumbnail_prompt": "サムネイルプロンプト"
+  "thumbnail_prompt": "サムネイルプロンプト（日本語）"
 }"""
 
 
@@ -66,7 +66,7 @@ def generate_script(theme: str = None) -> dict:
         system=SYSTEM_PROMPT,
         messages=[{
             "role": "user",
-            "content": f"テーマ「{theme}」で台本を作成してください。海外実話ベースで日本人向けにアレンジ。5000文字以内で。必ずJSON形式で返してください。",
+            "content": f"テーマ「{theme}」で台本を作成してください。海外実話ベースで日本人向けにアレンジ。ナレーション本文のみ・記号なし・5000文字以内。必ずJSON形式で返してください。",
         }],
     )
 
@@ -87,11 +87,21 @@ def generate_script(theme: str = None) -> dict:
             "thumbnail_prompt": "",
         }
 
+    # 記号・見出しを除去
+    import re
+    script = data.get("script", "")
+    script = re.sub(r"[☆◆●■▶︎①②③④⑤]", "", script)
+    script = re.sub(r"【[^】]*】", "", script)
+    script = re.sub(r"〈[^〉]*〉", "", script)
+    script = re.sub(r"\n{3,}", "\n\n", script)
+    script = script.strip()
+
     # 5000文字を超えていたらトリム
-    if len(data.get("script", "")) > 5000:
-        data["script"] = data["script"][:5000]
+    if len(script) > 5000:
+        script = script[:5000]
         print(f"[台本生成] 5000文字を超えたためトリムしました")
 
+    data["script"] = script
     data["generated_at"] = datetime.now().isoformat()
     data["theme_selected"] = theme
 
@@ -101,6 +111,7 @@ def generate_script(theme: str = None) -> dict:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
     print(f"[台本生成完了] 文字数: {len(data['script'])} | 保存先: {filename}")
+    print(f"[台本冒頭] {data['script'][:100]}")
     return data
 
 
@@ -108,3 +119,4 @@ if __name__ == "__main__":
     result = generate_script()
     print(f"タイトル: {result['title']}")
     print(f"文字数: {len(result['script'])}")
+    print(f"冒頭: {result['script'][:200]}")
