@@ -14,12 +14,16 @@ from upload_youtube import upload_to_youtube
 MAX_REVIEW_LOOPS = 3
 PASS_SCORE = 50  # 最高約65点なので50点を合格ラインに設定
 
+STAR = "★"
+LINE = "=" * 52
+THIN = "ー" * 26
+
 
 def run_pipeline(theme: str = None):
-    print("=" * 50)
+    print(LINE)
     print("「人生は七色」自動投稿パイプライン 開始")
     print(f"実行時刻: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print("=" * 50)
+    print(LINE)
 
     # ① 台本生成
     print("\n【ステップ1】台本生成")
@@ -69,12 +73,12 @@ def run_pipeline(theme: str = None):
     # 完了ログ
     save_log(script_data, review_result, status="uploaded", video_url=video_url)
 
-    print("\n" + "=" * 50)
+    print("\n" + LINE)
     print("✅ パイプライン完了！")
     print(f"動画URL: {video_url}")
     print(f"タイトル: {script_data['title']}")
     print(f"スコア: {review_result['score']['total']:.1f}点")
-    print("=" * 50)
+    print(LINE)
 
 
 def improve_script(script_data: dict, feedback: str) -> dict:
@@ -131,18 +135,102 @@ def improve_script(script_data: dict, feedback: str) -> dict:
 
 def save_log(script_data: dict, review_result, status: str, video_url: str = None):
     os.makedirs("logs", exist_ok=True)
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+
+    # ─── 既存：機械用JSONログ ───
     log = {
         "date": datetime.now().isoformat(),
         "status": status,
         "title": script_data.get("title", ""),
+        "script": script_data.get("script", ""),  # 台本全文も保存
         "score": review_result["score"]["total"] if review_result else 0,
+        "max_possible": review_result["score"]["max_possible"] if review_result else 0,
         "verdict": review_result["verdict"] if review_result else "",
         "video_url": video_url,
     }
-    filename = f"logs/log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-    with open(filename, "w", encoding="utf-8") as f:
+    json_path = f"logs/log_{timestamp}.json"
+    with open(json_path, "w", encoding="utf-8") as f:
         json.dump(log, f, ensure_ascii=False, indent=2)
-    print(f"[ログ保存] {filename}")
+    print(f"[ログ保存] {json_path}")
+
+    # ─── 追加：人間用テキストレポート ───
+    txt_path = f"logs/script_{timestamp}.txt"
+    _save_human_report(txt_path, script_data, review_result, status, video_url, timestamp)
+    print(f"[台本保存] {txt_path}")
+
+
+def _save_human_report(
+    path: str,
+    script_data: dict,
+    review_result,
+    status: str,
+    video_url: str,
+    timestamp: str,
+):
+    title = script_data.get("title", "（タイトルなし）")
+    script = script_data.get("script", "")
+    score_total = review_result["score"]["total"] if review_result else 0
+    score_max   = review_result["score"].get("max_possible", 65.0) if review_result else 65.0
+    verdict     = review_result["verdict"] if review_result else "ー"
+    breakdown   = review_result["score"].get("breakdown", {}) if review_result else {}
+    improvements = review_result.get("improvements", []) if review_result else []
+
+    # 判定アイコン
+    status_icon = {"uploaded": "✅ 投稿済み", "skipped": "⏭️ スキップ"}.get(status, f"⚠️ {status}")
+    verdict_icon = "✅ 投稿OK" if verdict == "投稿OK" else f"❌ {verdict}"
+
+    lines = []
+    lines.append(LINE)
+    lines.append("🎬  人生は七色 ー 台本レポート")
+    lines.append(LINE)
+    lines.append(f"📅 日時      : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    lines.append(f"📝 タイトル  : {title}")
+    lines.append(f"📊 スコア    : {score_total:.1f} / {score_max:.1f} 点")
+    lines.append(f"🏁 判定      : {verdict_icon}")
+    lines.append(f"📌 ステータス: {status_icon}")
+    if video_url:
+        lines.append(f"🔗 動画URL   : {video_url}")
+    lines.append(LINE)
+
+    # 台本全文
+    lines.append("")
+    lines.append("【台本全文】")
+    lines.append(THIN)
+    lines.append(script)
+    lines.append(THIN)
+
+    # レビュー詳細
+    if breakdown:
+        lines.append("")
+        lines.append("【レビュー詳細】")
+        EMOJI = ["①","②","③","④","⑤","⑥","⑦"]
+        for i, (name, detail) in enumerate(breakdown.items()):
+            stars_str = STAR * detail["stars"] + "☆" * (5 - detail["stars"])
+            role_tag = "👑 " if i == 6 else "   "
+            lines.append(
+                f"{role_tag}{EMOJI[i]} {name:<22}  {stars_str}  "
+                f"×{detail['weight']}  → {detail['points']:.1f}点"
+            )
+            # feedbackがあれば表示（review_resultのresultsから取得）
+            if review_result:
+                result = next(
+                    (r for r in review_result["results"] if r["reviewer_name"] == name), None
+                )
+                if result and result.get("feedback") and result["feedback"] != "採点エラー（デフォルト）":
+                    lines.append(f"       └ {result['feedback']}")
+
+    # 編集者コメント
+    if improvements:
+        lines.append("")
+        lines.append("【編集者コメント】")
+        for imp in improvements:
+            lines.append(f"  - {imp}")
+
+    lines.append("")
+    lines.append(LINE)
+
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
 
 
 if __name__ == "__main__":
