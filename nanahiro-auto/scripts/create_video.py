@@ -2,10 +2,12 @@ import os
 import json
 import requests
 import anthropic
+import numpy as np
 from datetime import datetime
+from PIL import Image, ImageDraw, ImageFont
 from moviepy.editor import (
     VideoFileClip, AudioFileClip, CompositeVideoClip,
-    concatenate_videoclips, TextClip, ColorClip, ImageClip
+    concatenate_videoclips, ColorClip, ImageClip
 )
 
 PEXELS_API_KEY = os.environ["PEXELS_API_KEY"]
@@ -108,46 +110,82 @@ def find_aligned_video(sentence: str, temp_dir: str, index: int) -> str:
             else:
                 os.remove(path)
 
-    # フォールバック：テキストカードを使用
     print(f"  [フォールバック] スコア不足 → テキストカードを使用")
     return None
 
 
-def make_text_card(text: str, duration: float) -> ColorClip:
-    """テキストカードを生成（映像が見つからない場合のフォールバック）"""
-    bg = ColorClip(size=(TARGET_W, TARGET_H), color=(20, 20, 40), duration=duration)
-    try:
-        txt = TextClip(
-            text[:50],
-            fontsize=40,
-            color="white",
-            stroke_color="gray",
-            stroke_width=1,
-            method="caption",
-            size=(TARGET_W - 120, None),
-            align="center",
-        ).set_duration(duration).set_pos("center")
-        return CompositeVideoClip([bg, txt], size=(TARGET_W, TARGET_H))
-    except:
-        return bg
+def _get_font(size: int):
+    """利用可能な日本語フォントを取得"""
+    font_candidates = [
+        "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+        "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
+        "/usr/share/fonts/noto-cjk/NotoSansCJK-Regular.ttc",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    ]
+    for path in font_candidates:
+        if os.path.exists(path):
+            try:
+                return ImageFont.truetype(path, size)
+            except Exception:
+                continue
+    return ImageFont.load_default()
 
 
-def make_subtitle(text: str, duration: float) -> TextClip:
-    """字幕クリップを生成"""
+def make_text_card(text: str, duration: float) -> ImageClip:
+    """テキストカードを生成（Pillow方式・ImageMagick不使用）"""
+    img = Image.new("RGB", (TARGET_W, TARGET_H), color=(20, 20, 40))
+    draw = ImageDraw.Draw(img)
+    font = _get_font(40)
+
+    display_text = text[:50]
     try:
-        # 35文字で折り返し
+        bbox = draw.textbbox((0, 0), display_text, font=font)
+        tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
+    except AttributeError:
+        tw, th = draw.textsize(display_text, font=font)
+
+    x = (TARGET_W - tw) // 2
+    y = (TARGET_H - th) // 2
+
+    draw.text((x + 2, y + 2), display_text, font=font, fill=(80, 80, 80))
+    draw.text((x, y), display_text, font=font, fill=(255, 255, 255))
+
+    arr = np.array(img)
+    return ImageClip(arr).set_duration(duration)
+
+
+def make_subtitle(text: str, duration: float) -> ImageClip:
+    """字幕クリップを生成（Pillow方式・ImageMagick不使用）"""
+    try:
         if len(text) > 35:
             text = text[:35] + "\n" + text[35:70]
-        clip = TextClip(
-            text,
-            fontsize=34,
-            color="white",
-            stroke_color="black",
-            stroke_width=2,
-            method="caption",
-            size=(TARGET_W - 80, None),
-            align="center",
-        ).set_duration(duration - 0.2)
+
+        font = _get_font(34)
+        line_h = 44
+        lines = text.split("\n")
+        total_h = line_h * len(lines) + 16
+        bar_w = TARGET_W - 80
+
+        img = Image.new("RGBA", (bar_w, total_h), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+
+        for li, line in enumerate(lines):
+            try:
+                bbox = draw.textbbox((0, 0), line, font=font)
+                tw = bbox[2] - bbox[0]
+            except AttributeError:
+                tw, _ = draw.textsize(line, font=font)
+            x = (bar_w - tw) // 2
+            y = li * line_h + 8
+
+            for dx in (-2, 0, 2):
+                for dy in (-2, 0, 2):
+                    if dx != 0 or dy != 0:
+                        draw.text((x + dx, y + dy), line, font=font, fill=(0, 0, 0, 255))
+            draw.text((x, y), line, font=font, fill=(255, 255, 255, 255))
+
+        arr = np.array(img)
+        clip = ImageClip(arr, ismask=False).set_duration(duration - 0.2)
         return clip
     except Exception as e:
         print(f"[字幕エラー] {e}")
@@ -160,19 +198,16 @@ def create_video(script_data: dict, audio_path: str) -> str:
 
     print(f"[動画合成] アライメントスコアモードで開始")
 
-    # 音声読み込み
     audio = AudioFileClip(audio_path)
     total_duration = audio.duration
     print(f"[動画合成] 音声の長さ: {total_duration:.1f}秒")
 
-    # 台本を文に分割
     sentences = []
     for line in script_text.replace("。", "。\n").split("\n"):
         line = line.strip()
         if len(line) > 5:
             sentences.append(line)
 
-    # 最大20シーンに分割
     max_scenes = min(20, len(sentences))
     scene_sentences = sentences[:max_scenes]
     scene_duration = total_duration / max(len(scene_sentences), 1)
@@ -181,7 +216,6 @@ def create_video(script_data: dict, audio_path: str) -> str:
 
     os.makedirs("temp", exist_ok=True)
 
-    # 各シーンに映像を割り当て
     video_clips = []
     subtitle_clips = []
 
@@ -198,7 +232,6 @@ def create_video(script_data: dict, audio_path: str) -> str:
                 use_dur = min(scene_duration, clip.duration)
                 clip = clip.subclip(0, use_dur)
                 if use_dur < scene_duration:
-                    # 短い場合はループ
                     loops = int(scene_duration / use_dur) + 1
                     clip = concatenate_videoclips([clip] * loops).subclip(0, scene_duration)
                 clip = clip.set_start(start_time)
@@ -211,23 +244,19 @@ def create_video(script_data: dict, audio_path: str) -> str:
             card = make_text_card(sentence, scene_duration).set_start(start_time)
             video_clips.append(card)
 
-        # 字幕追加
         sub = make_subtitle(sentence, scene_duration)
         if sub:
             sub = sub.set_start(start_time).set_pos(("center", TARGET_H - 120))
             subtitle_clips.append(sub)
 
-    # 映像が空の場合のフォールバック
     if not video_clips:
         video_clips = [ColorClip(size=(TARGET_W, TARGET_H), color=(10, 10, 30), duration=total_duration)]
 
-    # 合成
     print("\n[動画合成] 全クリップを合成中...")
     all_clips = video_clips + subtitle_clips
     final_video = CompositeVideoClip(all_clips, size=(TARGET_W, TARGET_H))
     final_video = final_video.set_duration(total_duration).set_audio(audio)
 
-    # 出力
     output_dir = "output"
     os.makedirs(output_dir, exist_ok=True)
     filename = f"{output_dir}/video_{datetime.now().strftime('%Y%m%d_%H%M%S')}.mp4"
@@ -242,7 +271,6 @@ def create_video(script_data: dict, audio_path: str) -> str:
         logger=None,
     )
 
-    # 一時ファイル削除
     import glob
     for f in glob.glob("temp/*.mp4"):
         try:
