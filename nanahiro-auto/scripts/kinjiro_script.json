@@ -1,0 +1,278 @@
+{
+  "title": "LAサバイバル・レース 〜金次郎、至高の宴〜",
+  "type": "restaurant_promo",
+  "restaurant": "Izakaya Kinjiro",
+  "location": "Little Tokyo, Los Angeles",
+  "youtube_url": "https://youtu.be/-AqndPZehHs",
+  "tags": ["金次郎", "izakaya", "LittleTokyo", "losangeles", "LA居酒屋", "リトルトーキョー", "牛タン", "居酒屋", "グルメ"],
+  "characters": {
+    "もっちゃん": {
+      "gender": "male",
+      "transport": "地中（巨大シャベル）",
+      "outfit_start": "作業着→タキシード",
+      "trait": "最短距離は直線だ！"
+    },
+    "けい": {
+      "gender": "female",
+      "transport": "ヘリコプター",
+      "outfit_start": "赤いドレス（破損）→修復",
+      "trait": "揚げ出し豆腐愛・乱気流でボサボサ"
+    },
+    "さとし": {
+      "gender": "male",
+      "transport": "巨大ドローン",
+      "outfit_start": "カジュアル→ススまみれ",
+      "trait": "バッテリー計算ミス"
+    },
+    "いださん": {
+      "gender": "male",
+      "transport": "LAリバー（クロール）",
+      "outfit_start": "ゴーグル・半裸",
+      "trait": "水路は裏切らない"
+    },
+    "えいちゃん": {
+      "gender": "female",
+      "transport": "ウェイモ（自動運転）",
+      "outfit_start": "ビジネスカジュアル→片足裸足",
+      "trait": "AIへの怒り"
+    }
+  },
+  "scenes": [
+    {
+      "id": 1,
+      "name": "激震の火曜日",
+      "setting": "ロサンゼルス、屋外",
+      "dialogue": [
+        {"speaker": "narrator", "line": "ロサンゼルスの午後。５人のスマホが一斉に鳴る。"},
+        {"speaker": "narrator", "line": "速報：リトルトーキョーの名店・金次郎、奇跡の２テーブル増席！今なら予約可！"},
+        {"speaker": "もっちゃん", "line": "今なら行ける！"},
+        {"speaker": "けい", "line": "ロサンゼルス中の食通がライバルだ！"},
+        {"speaker": "さとし", "line": "現地集合！"}
+      ],
+      "visual_description": "５人がスマホを見て驚く",
+      "image_prompt": "Five Japanese friends in Los Angeles checking smartphones simultaneously, shocked and excited expressions, sunny LA street, cinematic wide shot, vibrant colors, breaking news notification on screen about restaurant reservation",
+      "pexels_query": "people checking phone excited city",
+      "duration_seconds": 8
+    },
+    {
+      "id": 2,
+      "name": "もっちゃんの地下突破作戦",
+      "setting": "地中",
+      "dialogue": [
+        {"speaker": "もっちゃん", "line": "最短距離は直線だ！"},
+        {"speaker": "narrator", "line": "もっちゃんは、愛用の巨大シャベルでアスファルトを突き破り、地中を掘り進んでいた。"},
+        {"speaker": "もっちゃん", "line": "し、しまった！ 地下鉄のトンネルだ！"},
+        {"speaker": "もっちゃん", "line": "くそっ、牛タンが遠のく…！ 負けてたまるかあぁ！"}
+      ],
+      "visual_description": "タキシードの男性が地中でシャベルを持ち、泥だらけで地下鉄トンネルに遭遇",
+      "image_prompt": "Japanese man in tuxedo digging underground tunnel with giant shovel, face and hands covered in mud, shocked expression discovering metro subway tunnel with train passing, underground dramatic lighting, comedy action movie style, cinematic",
+      "pexels_query": "underground tunnel digging construction dramatic",
+      "duration_seconds": 12
+    },
+    {
+      "id": 3,
+      "name": "けいの乱気流バトル",
+      "setting": "上空3000フィート、ヘリコプター内",
+      "dialogue": [
+        {"speaker": "narrator", "line": "けいは、真っ赤なドレスでヘリの操縦桿を握っていた。"},
+        {"speaker": "けい", "line": "優雅なランチね"},
+        {"speaker": "narrator", "line": "しかし、突如としてLA名物「サンタアナ・ウィンド」が襲いかかる！"},
+        {"speaker": "けい", "line": "きゃああ！ 機体が安定しない！"},
+        {"speaker": "けい", "line": "メーデー！ メーデー！ でも着陸なんてしないわ、金次郎に着くまでは！"}
+      ],
+      "visual_description": "赤いドレスの女性がヘリコプターを操縦、強風でボサボサ髪になりながら必死に操縦",
+      "image_prompt": "Japanese woman in red dress piloting helicopter above Los Angeles skyline, hair completely blown wild by Santa Ana winds, fierce determined expression, cockpit dashboard with warning lights, storm clouds, dramatic aerial action shot, cinematic",
+      "pexels_query": "helicopter cockpit aerial Los Angeles flight",
+      "duration_seconds": 14
+    },
+    {
+      "id": 4,
+      "name": "さとしのドローン電池切れ危機",
+      "setting": "高層ビルの谷間、上空",
+      "dialogue": [
+        {"speaker": "narrator", "line": "さとしの乗る巨大ドローンは順調だった。…はずだった。"},
+        {"speaker": "drone", "line": "ピピピッ！ バッテリー残量10％"},
+        {"speaker": "さとし", "line": "えっ、計算ミス！？ 重量がオーバーしてるのか？"},
+        {"speaker": "さとし", "line": "頼む、持ってくれ！ 俺の体重を支えてくれ！"}
+      ],
+      "visual_description": "男性が巨大ドローンに乗りビル間を飛行、ポケットから小銭を投げ捨てる",
+      "image_prompt": "Japanese young man riding atop a giant commercial drone flying between Los Angeles skyscrapers, frantically throwing coins and objects from pockets overboard, low battery warning display, desperate panicked expression, aerial cinematic shot, action comedy",
+      "pexels_query": "drone aerial Los Angeles skyscrapers flying",
+      "duration_seconds": 12
+    },
+    {
+      "id": 5,
+      "name": "いださんのLAリバー格闘戦",
+      "setting": "LAリバー（コンクリートの川）",
+      "dialogue": [
+        {"speaker": "narrator", "line": "水路は裏切らない、といださんは確信していた。"},
+        {"speaker": "いださん", "line": "い、痛ってぇ！"},
+        {"speaker": "narrator", "line": "水深が急に浅くなり、お腹を川底に強打。さらに前方にはショッピングカートのバリケードが！"},
+        {"speaker": "いださん", "line": "泳げないなら、這うしかない！"}
+      ],
+      "visual_description": "ゴーグル姿の男性がコンクリートのLAリバーでクロール、障害物と格闘",
+      "image_prompt": "Japanese man wearing swim goggles crawling through shallow concrete LA River channel, muddy brown water, stomach hitting concrete bottom, wrestling with abandoned shopping cart barrier, gritty urban Los Angeles setting, action comedy cinematic",
+      "pexels_query": "river channel urban concrete swimming struggle",
+      "duration_seconds": 12
+    },
+    {
+      "id": 6,
+      "name": "えいちゃんvsウェイモAI",
+      "setting": "LAの交差点、ウェイモ車内",
+      "dialogue": [
+        {"speaker": "narrator", "line": "一番スマートなのは私、とえいちゃんは余裕の表情だった。"},
+        {"speaker": "waymo_ai", "line": "前方に正体不明の物体を検知。安全のため停車します"},
+        {"speaker": "えいちゃん", "line": "え？ なんで止まるの？"},
+        {"speaker": "えいちゃん", "line": "ただのゴミじゃない！ 進んでよ！"},
+        {"speaker": "えいちゃん", "line": "もうっ！ 時間がないのに！"}
+      ],
+      "visual_description": "女性がウェイモの車内でビニール袋に阻まれた自動運転AIに怒る",
+      "image_prompt": "Japanese woman in business casual inside stopped Waymo autonomous vehicle at Los Angeles intersection, furiously banging on the windows, AI screen showing obstacle warning, plastic bag blowing outside in wind, frustrated expression, comedy cinematic",
+      "pexels_query": "woman frustrated car stopped traffic intersection",
+      "duration_seconds": 14
+    },
+    {
+      "id": 7,
+      "name": "満身創痍の到着",
+      "setting": "リトルトーキョー、ホンダプラザ駐車場",
+      "dialogue": [
+        {"speaker": "narrator", "line": "リトルトーキョー、ホンダプラザの駐車場。地面が隆起し、マンホールが飛び、空から機体が不時着し、人間が走ってくる。"},
+        {"speaker": "narrator", "line": "土煙が晴れると、そこには見るも無惨な５人の姿があった。"},
+        {"speaker": "もっちゃん", "line": "全員、いるな？"},
+        {"speaker": "narrator", "line": "しかし、こんな姿では高級居酒屋の敷居は高い…"},
+        {"speaker": "えいちゃん", "line": "見て！ 隣！"}
+      ],
+      "visual_description": "泥だらけ・ボサボサ・ススまみれ・半裸・片足裸足の5人が駐車場で合流",
+      "image_prompt": "Five completely disheveled Japanese friends meeting in Little Tokyo Los Angeles parking lot: one in muddy tuxedo, one woman with wild hair in torn red dress, one soot-covered, one shirtless with mud, one missing a shoe, all grinning at each other, comedy movie style, cinematic wide shot",
+      "pexels_query": "group friends Little Tokyo Los Angeles urban",
+      "duration_seconds": 16
+    },
+    {
+      "id": 8,
+      "name": "超特急クリーニング３秒仕上げ",
+      "setting": "謎のクリーニング店",
+      "dialogue": [
+        {"speaker": "narrator", "line": "金次郎のすぐ隣に、眩しいネオンサインが輝いていた。"},
+        {"speaker": "narrator", "line": "SUPER INSTANT CLEANING - 3 Seconds Finish！"},
+        {"speaker": "all", "line": "これだぁぁぁーー！！"},
+        {"speaker": "narrator", "line": "店の中からは、洗車機のような凄まじい音と蒸気が…"}
+      ],
+      "visual_description": "5人が超特急クリーニング店に飛び込む、蒸気と爆音",
+      "image_prompt": "Futuristic neon-lit instant cleaning shop with sign SUPER INSTANT CLEANING 3 Seconds Finish, five people rushing inside, steam and light effects, sci-fi comedy interior, bright colors, cinematic",
+      "pexels_query": "car wash steam cleaning neon lights futuristic",
+      "duration_seconds": 10
+    },
+    {
+      "id": 9,
+      "name": "華麗なる入店",
+      "setting": "Izakaya Kinjiro 店内",
+      "dialogue": [
+        {"speaker": "narrator", "line": "金次郎の扉が静かに開く。"},
+        {"speaker": "staff", "line": "いらっしゃいませ…あっ！"},
+        {"speaker": "narrator", "line": "そこには、後光が差すほど美しく整った５人の姿があった。もっちゃんはなぜかタキシード。"},
+        {"speaker": "all_elegant", "line": "予約の５名です。…少し、急いで来ましたので"}
+      ],
+      "visual_description": "ピカピカになった5人が優雅に入店、タキシードのもっちゃん",
+      "image_prompt": "Five impeccably dressed elegant Japanese people making grand entrance into warm traditional Japanese izakaya restaurant in Little Tokyo, gleaming clean sophisticated outfits, one man in tuxedo, warm golden restaurant lighting, staff bowing in welcome, cinematic",
+      "pexels_query": "Japanese restaurant entrance elegant dining izakaya",
+      "duration_seconds": 10
+    },
+    {
+      "id": 10,
+      "name": "厚切り牛タン",
+      "setting": "金次郎、テーブル",
+      "dialogue": [
+        {"speaker": "narrator", "line": "炭火で香ばしく焼かれた分厚い牛タン。"},
+        {"speaker": "もっちゃん", "line": "うまい！ この厚みがたまらん！"}
+      ],
+      "visual_description": "炭火で焼かれた分厚い牛タンのアップ",
+      "image_prompt": "Thick sliced grilled beef tongue on Japanese charcoal grill at upscale izakaya, golden brown crispy exterior, steam rising, mouthwatering close-up food photography, professional lighting, Izakaya Kinjiro Little Tokyo",
+      "pexels_query": "grilled meat Japanese BBQ closeup food",
+      "duration_seconds": 8
+    },
+    {
+      "id": 11,
+      "name": "カンパチの炙り",
+      "setting": "金次郎、テーブル",
+      "dialogue": [
+        {"speaker": "narrator", "line": "脂の乗った身にピリ辛ポン酢が光る。"},
+        {"speaker": "さとし", "line": "う〜ん、香ばしい！"}
+      ],
+      "visual_description": "カンパチの炙りの美しい盛り付け",
+      "image_prompt": "Kampachi yellowtail tataki sashimi with spicy ponzu sauce and green onions, close-up Japanese restaurant food photography, beautiful plating, fresh glistening, izakaya style, elegant presentation",
+      "pexels_query": "Japanese sashimi fish ponzu elegant plating",
+      "duration_seconds": 8
+    },
+    {
+      "id": 12,
+      "name": "ボンマロー（牛骨髄）",
+      "setting": "金次郎、テーブル",
+      "dialogue": [
+        {"speaker": "narrator", "line": "骨髄の上に熱々の田楽みそ。パンに乗せて頬張る。"},
+        {"speaker": "えいちゃん", "line": "濃厚すぎる…疲れが吹き飛ぶ味だ"}
+      ],
+      "visual_description": "ボンマローと田楽みそのリッチな盛り付け",
+      "image_prompt": "Bone marrow with den miso on crispy bread at Japanese izakaya restaurant, rich golden color, luxurious decadent presentation, close-up food photography, warm lighting",
+      "pexels_query": "bone marrow bread izakaya rich food",
+      "duration_seconds": 8
+    },
+    {
+      "id": 13,
+      "name": "揚げ出し豆腐",
+      "setting": "金次郎、テーブル",
+      "dialogue": [
+        {"speaker": "narrator", "line": "そして、けいの目の前に大好物が置かれる。"},
+        {"speaker": "けい", "line": "これよこれ！ 私の揚げ出し豆腐！"},
+        {"speaker": "けい", "line": "はふはふ…ん〜っ！ 天国！"}
+      ],
+      "visual_description": "揚げ出し豆腐の黄金色の美しい盛り付け",
+      "image_prompt": "Japanese agedashi tofu deep fried tofu in dashi broth, crispy golden exterior, garnished with grated daikon and scallions, steam rising, traditional izakaya presentation, close-up food photography, warm lighting",
+      "pexels_query": "Japanese tofu fried dashi broth elegant food",
+      "duration_seconds": 10
+    },
+    {
+      "id": 14,
+      "name": "ウニリゾット＆だしいくら",
+      "setting": "金次郎、テーブル",
+      "dialogue": [
+        {"speaker": "narrator", "line": "黄金色のリゾットと輝くいくら。"},
+        {"speaker": "narrator", "line": "５人はスプーンが止まらない。"}
+      ],
+      "visual_description": "ウニリゾットといくらの豪華な盛り付け",
+      "image_prompt": "Uni sea urchin risotto with ikura salmon roe, golden creamy risotto topped with fresh sea urchin and glistening salmon roe, Japanese fusion upscale cuisine, elegant plating, close-up food photography",
+      "pexels_query": "risotto sea urchin salmon roe elegant Japanese",
+      "duration_seconds": 8
+    },
+    {
+      "id": 15,
+      "name": "苦労した甲斐があった",
+      "setting": "金次郎、テーブル",
+      "dialogue": [
+        {"speaker": "all", "line": "苦労した甲斐があったーー！！"},
+        {"speaker": "narrator", "line": "あっという間にテーブルは空になり、全員のお腹はパンパンのぽんぽこりんに膨れ上がった。"}
+      ],
+      "visual_description": "5人が満面の笑みで乾杯",
+      "image_prompt": "Five happy Japanese friends around table in warm izakaya restaurant Little Tokyo, empty plates, huge joyful smiles, raising sake cups in toast, celebratory warm golden atmosphere, cinematic",
+      "pexels_query": "friends celebrating dinner restaurant toasting cheers",
+      "duration_seconds": 10
+    },
+    {
+      "id": 16,
+      "name": "ラストシーン",
+      "setting": "金次郎、外",
+      "dialogue": [
+        {"speaker": "narrator", "line": "店を出て、夜風に当たる５人。"},
+        {"speaker": "narrator", "line": "やっぱ金次郎は最高だね！"},
+        {"speaker": "narrator", "line": "２テーブル増えて来やすくなったね、また来よう！"},
+        {"speaker": "narrator", "line": "リトルトーキョーの夜に、お店の温かい灯りがいつまでも輝いていた。"}
+      ],
+      "visual_description": "夜のリトルトーキョー、金次郎の看板が輝く",
+      "image_prompt": "Five happy friends leaving Japanese izakaya restaurant at night in Little Tokyo Los Angeles, warm glowing restaurant sign Kinjiro behind them, city night lights, satisfied smiles, cinematic night scene",
+      "pexels_query": "Little Tokyo Los Angeles night lights restaurant",
+      "duration_seconds": 12
+    }
+  ],
+  "teaser_text": "ご予約はお早めに！ Izakaya Kinjiro",
+  "narrator_script": "ロサンゼルスの午後。５人のスマホが一斉に鳴る。速報：リトルトーキョーの名店・金次郎、奇跡の２テーブル増席！今なら予約可！その通知は、彼らにとって開戦の合図だった。もっちゃんは巨大シャベルで地中を突き進み、けいはヘリで乱気流と闘い、さとしはドローンのバッテリーと戦い、いださんはLAリバーを這いずり回り、えいちゃんはウェイモのAIに怒鳴り続けた。満身創痍で辿り着いた先にあった奇跡。超特急クリーニングで蘇った５人は、金次郎の扉を開いた。厚切り牛タン、カンパチの炙り、ボンマロー、揚げ出し豆腐、ウニリゾット＆だしいくら。テーブルに並ぶ至高の料理を前に、全ての苦労が報われた。やっぱ金次郎は最高だね。２テーブル増えて来やすくなったね、また来よう。リトルトーキョーの夜に、お店の温かい灯りがいつまでも輝いていた。ご予約はお早めに、Izakaya Kinjiro。",
+  "generated_at": "2026-06-14T22:23:46"
+}
