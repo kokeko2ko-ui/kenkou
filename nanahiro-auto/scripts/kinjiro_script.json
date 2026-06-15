@@ -5,37 +5,105 @@
   "location": "Little Tokyo, Los Angeles",
   "youtube_url": "https://youtu.be/-AqndPZehHs",
   "tags": ["金次郎", "izakaya", "LittleTokyo", "losangeles", "LA居酒屋", "リトルトーキョー", "牛タン", "居酒屋", "グルメ"],
+  "opening_sequence": {
+    "gem_cards": [
+      {"text": "ルビーではなく——", "color": "white", "duration_sec": 1.5},
+      {"text": "サファイアでもなく——", "color": "white", "duration_sec": 1.5},
+      {"text": "ダイヤモンドでもなく——", "color": "white", "duration_sec": 1.5},
+      {"text": "「金」だ。", "color": "gold", "duration_sec": 2.0},
+      {"text": "LAで最も輝く「金」——", "color": "white", "duration_sec": 1.5},
+      {"text": "金次郎。", "color": "gold", "duration_sec": 2.5}
+    ],
+    "tagline": "予約が取れないと噂の金次郎。その常連たちが動いた。",
+    "tagline_duration_sec": 3.0,
+    "plan_a": "黒背景＋白/金テキストのみ（CapCutで1行ずつフェードイン）",
+    "plan_b": "宝石マクロ実写orAI画像＋テキストオーバーレイ"
+  },
   "characters": {
     "もっちゃん": {
+      "real_person": true,
       "gender": "male",
+      "role_at_kinjiro": "Sous Chef",
+      "real_job": "本物の焼鳥職人",
+      "title_en": "Chief Skewer Officer (CSO)",
+      "tagline_en": "Quietly the most dangerous man in Little Tokyo",
+      "scene1_setting": "自宅の庭で焼鳥屋台。子供たちが群がり大人5人と楽しんでいる",
+      "outfit_scene1": "紺の和柄甚平＋濃い色のハチマキ",
+      "outfit_end": "タキシード（なぜか。理由説明なし or 「間違えました」ギャグ）",
       "transport": "地中（巨大シャベル）",
-      "outfit_start": "作業着→タキシード",
+      "reaction_c10": "串を投げかけて寸止め→「食べ物は投げてはだめだよ。大切に」（早口）→「行くぞ！！」",
       "trait": "最短距離は直線だ！"
     },
-    "けい": {
+    "けいちゃん": {
+      "real_person": true,
       "gender": "female",
-      "transport": "ヘリコプター",
-      "outfit_start": "赤いドレス（破損）→修復",
+      "role_at_kinjiro": "サーバー（同レストラン）",
+      "real_job": "個人で洋服デザイン・制作",
+      "title_en": "Server by Day. Designer by Night.",
+      "tagline_en": "The most stylish person at every table",
+      "scene1_setting": "ヘリコプターのコクピット、LA上空（快晴）",
+      "outfit_scene1": "赤いカクテルドレス",
+      "outfit_end": "赤いドレス（修復済み）",
+      "transport": "ヘリコプター（サンタアナ風でボサボサ）",
+      "favorite_food": "揚げ出し豆腐",
       "trait": "揚げ出し豆腐愛・乱気流でボサボサ"
     },
-    "さとし": {
+    "さとしさん": {
+      "real_person": true,
       "gender": "male",
+      "role_at_kinjiro": "マネージャー（けいちゃんと同じレストラン）",
+      "title_en": "The Man Who Runs the Room",
+      "tagline_en": "Manages everything — except his excitement right now",
+      "scene1_setting": "高層ビルの重役会議室、夜景バック",
+      "outfit_scene1": "黒スーツ・銀髪・貫禄",
+      "outfit_end": "黒スーツ（スス汚れは顔のみ・スーツは無傷）",
       "transport": "巨大ドローン",
-      "outfit_start": "カジュアル→ススまみれ",
+      "soot_note": "黒スーツにススは見えないので、スス汚れは顔だけに集中させること",
       "trait": "バッテリー計算ミス"
     },
     "いださん": {
+      "real_person": true,
       "gender": "male",
-      "transport": "LAリバー（クロール）",
-      "outfit_start": "ゴーグル・半裸",
+      "background": "日本から来るたびに金次郎を訪問する常連。日本で串焼き店を経営",
+      "title_en": "Flew From Japan. Again.",
+      "tagline_en": "Serial yakitori entrepreneur. Loyal customer first.",
+      "scene1_setting": "近未来ホログラムオフィス、複数モニター・ヘッドセット",
+      "outfit_scene1": "白ジャケット＋メガネ",
+      "outfit_end": "ずぶ濡れ白ジャケット（半裸はNG・ブランドイメージ配慮）",
+      "transport": "LAリバー（水が浅い→這う→ショッピングカート格闘）",
       "trait": "水路は裏切らない"
     },
     "えいちゃん": {
+      "real_person": false,
+      "face": "AI生成（本人の顔は使わない）",
       "gender": "female",
-      "transport": "ウェイモ（自動運転）",
-      "outfit_start": "ビジネスカジュアル→片足裸足",
-      "trait": "AIへの怒り"
+      "background": "けいちゃんの友達。毎年LAに来るたびに隔週〜毎週もっちゃんの料理を食べに来る謎の存在",
+      "title_en": "Origin: Unknown. Loyalty: Unmatched.",
+      "tagline_en": "Flies to LA. Finds Mocchan. Eats. Repeats.",
+      "mystery_note": "テロップ演出：「※この人物の詳細は不明です」",
+      "scene1_setting": "ウェイモ後部座席でタブレットをスクロール中、ビバリーヒルズのブティック街",
+      "outfit_scene1": "黒レースドレス",
+      "outfit_end": "黒レースドレス（片足のヒールなし）",
+      "transport": "ウェイモ（ビニール袋でAIが停車・窓を叩いて怒る）",
+      "key_line": "現地集合。遅れた人、牛タン抜き。",
+      "trait": "AIへの怒り・謎の存在感"
     }
+  },
+  "production_rules": {
+    "food_scenes": "料理シーンは必ず実写（AI生成は食欲をそがれる）",
+    "kling_prompt_rules": "NO text overlays. NO subtitles. NO watermarks. Clean footage only.",
+    "children_in_frame": "Children in soft background bokeh, faces not in sharp focus（AIの目の肥大化を防ぐ）",
+    "satoshi_soot": "スス汚れは顔のみ。黒スーツにススは視覚的に見えないため",
+    "iida_san_water": "半裸はNG。ずぶ濡れ白ジャケットで代替",
+    "food_reactions": "リアクションは各キャラの職業・性格に紐づけること（汎用的な「うまい！」はNG）",
+    "mocchan_tuxedo": "タキシードはラストのみ。理由は謎のまま（または「間違えました」ギャグ）"
+  },
+  "character_titles": {
+    "もっちゃん": "Chief Skewer Officer (CSO)",
+    "けいちゃん": "Server by Day. Designer by Night.",
+    "さとしさん": "The Man Who Runs the Room",
+    "いださん": "Flew From Japan. Again.",
+    "えいちゃん": "Origin: Unknown. Loyalty: Unmatched."
   },
   "scenes": [
     {
