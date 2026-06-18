@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__229a082d-754f-4f7b-bdcf-c10443356f5a__generate_image",
+      "mcp__229a082d-754f-4f7b-bdcf-c10443356f5a__job_display",
+      "mcp__229a082d-754f-4f7b-bdcf-c10443356f5a__show_generations",
+      "mcp__229a082d-754f-4f7b-bdcf-c10443356f5a__generate_video",
+      "mcp__229a082d-754f-4f7b-bdcf-c10443356f5a__generate_audio",
+      "mcp__229a082d-754f-4f7b-bdcf-c10443356f5a__media_confirm",
+      "mcp__229a082d-754f-4f7b-bdcf-c10443356f5a__show_medias",
+      "mcp__229a082d-754f-4f7b-bdcf-c10443356f5a__models_explore"
+    ]
+  }
+}
