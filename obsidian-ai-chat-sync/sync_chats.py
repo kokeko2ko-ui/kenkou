@@ -177,7 +177,12 @@ def parse_gemini(data) -> Iterable[Conversation]:
 
     for day in sorted(by_day):
         items = sorted(by_day[day], key=lambda x: x.get("time", ""))
-        c = Conversation("Gemini", f"Gemini {day}", to_iso(items[0].get("time")))
+        # その日の最初のプロンプトをタイトルに添えて見分けやすくする
+        first_raw = items[0].get("title", "")
+        first_prompt = re.sub(r"^(Prompted|Asked|入力)\s*:?\s*", "", first_raw).strip()
+        snippet = first_prompt.split("\n")[0][:30]
+        day_title = f"{day}｜{snippet}" if snippet else day
+        c = Conversation("Gemini", day_title, to_iso(items[0].get("time")))
         for item in items:
             raw = item.get("title", "")
             prompt = re.sub(r"^(Prompted|Asked|入力)\s*:?\s*", "", raw).strip()
