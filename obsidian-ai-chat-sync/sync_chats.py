@@ -131,30 +131,61 @@ def parse_claude(data) -> Iterable[Conversation]:
             yield c
 
 
+_TAG = re.compile(r"<[^>]+>")
+_HTML_ENT = {"&nbsp;": " ", "&amp;": "&", "&lt;": "<", "&gt;": ">",
+             "&quot;": '"', "&#39;": "'"}
+
+
+def strip_html(html: str) -> str:
+    """safeHtmlItem の HTML を素朴に Markdown 風プレーンテキストへ変換する。"""
+    if not html:
+        return ""
+    html = re.sub(r"</(p|h[1-6]|li|ul|ol)>", "\n", html)
+    html = re.sub(r"<li[^>]*>", "- ", html)
+    html = re.sub(r"<h[1-6][^>]*>", "### ", html)
+    text = _TAG.sub("", html)
+    for ent, ch in _HTML_ENT.items():
+        text = text.replace(ent, ch)
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return text.strip()
+
+
+def _is_gemini(item: dict) -> bool:
+    header = (item.get("header", "") or "").lower()
+    if "gemini" in header or "bard" in header:
+        return True
+    return any(
+        "gemini" in p.lower() or "bard" in p.lower()
+        for p in item.get("products", []) or []
+    )
+
+
 def parse_gemini(data) -> Iterable[Conversation]:
     """Gemini (Google Takeout マイアクティビティ) の JSON をパースする。
 
-    各エントリは 1 プロンプトと、まれに応答を含む。プロンプトごとに
-    1 ノートを作る（Takeout はスレッドを保持しないため）。
+    Takeout はスレッドを保持しないため、同じ日付のやり取りを 1 ノートに
+    まとめる（プロンプトと safeHtmlItem の応答をセクションとして並べる）。
     """
+    # 日付ごとにエントリをまとめる（古い順）
+    by_day: dict[str, list[dict]] = {}
     for item in data:
-        if "gemini" not in (item.get("header", "") or "").lower() and \
-           "bard" not in (item.get("header", "") or "").lower():
-            # 別プロダクトのアクティビティはスキップ
-            if item.get("products") and not any(
-                "gemini" in p.lower() or "bard" in p.lower()
-                for p in item["products"]
-            ):
-                continue
+        if not _is_gemini(item):
+            continue
+        time = item.get("time", "")
+        day = str(time)[:10] or "unknown"
+        by_day.setdefault(day, []).append(item)
 
-        raw = item.get("title", "")
-        prompt = re.sub(r"^(Prompted|Asked|入力)\s*:?\s*", "", raw).strip()
-        created = to_iso(item.get("time"))
-        title = prompt.split("\n")[0][:80] or "Untitled"
-        c = Conversation("Gemini", title, created)
-        c.add("human", prompt)
-        for sub in item.get("subtitles", []) or []:
-            c.add("assistant", sub.get("name", ""))
+    for day in sorted(by_day):
+        items = sorted(by_day[day], key=lambda x: x.get("time", ""))
+        c = Conversation("Gemini", f"Gemini {day}", to_iso(items[0].get("time")))
+        for item in items:
+            raw = item.get("title", "")
+            prompt = re.sub(r"^(Prompted|Asked|入力)\s*:?\s*", "", raw).strip()
+            c.add("human", prompt)
+            for sub in item.get("safeHtmlItem", []) or []:
+                c.add("assistant", strip_html(sub.get("html", "")))
+            for sub in item.get("subtitles", []) or []:
+                c.add("assistant", sub.get("name", ""))
         if c.messages:
             yield c
 
